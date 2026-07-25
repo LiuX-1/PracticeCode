@@ -51,7 +51,7 @@ public:
 
 
 
-int main() {
+int main1() {
     D d(1, 2, 3, 4);
     cout << "d: " << d.a << endl;
     std::cout << "Hello, World!" << std::endl;
@@ -61,3 +61,44 @@ int main() {
 // 成员变量
 // struct 里默认是 public
 // class 里默认是 private
+
+
+
+class animal {
+public:
+    virtual void speak()
+    {
+        cout << "animal speak" << endl;
+    }
+};
+
+class dog : public animal {
+public:
+    void speak() override
+    {
+        cout << "dog speak" << endl;
+    }
+};
+
+class cat : public animal {
+public:
+    void speak() override
+    {
+        cout << "cat speak" << endl;
+    }
+
+};
+
+void test_animal(animal& a)
+{
+    a.speak();
+}
+
+int main()
+{
+    cat c;
+    dog d;
+    test_animal(c);
+    test_animal(d);
+    return 0;
+}
