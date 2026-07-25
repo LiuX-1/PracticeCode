@@ -94,7 +94,7 @@ void test_animal(animal& a)
     a.speak();
 }
 
-int main()
+int main2()
 {
     cat c;
     dog d;
@@ -102,3 +102,32 @@ int main()
     test_animal(d);
     return 0;
 }
+
+
+class base {
+public:
+    virtual ~base() {
+        cout << "base destructor" << endl;
+    }
+
+};
+
+class derived : public base {
+public:
+    ~derived() {
+        cout << "derived destructor" << endl;
+    }
+};
+
+int main()
+{
+    base* b = new derived;
+    derived* d = new derived;
+    cout << "delete b" << endl;
+    delete b; 
+    cout << "delete d" << endl;
+    delete d; 
+    return 0;
+}
+
+// 因为每个对象内部都有一个隐藏的指针（vptr），指向一张虚函数表（vtable）。当基类析构函数是虚函数时，delete 操作会通过这个指针，在运行时找到当前对象真正的类型，从而调用正确的析构函数。
