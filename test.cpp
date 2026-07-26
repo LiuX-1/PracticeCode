@@ -1,6 +1,7 @@
 #include <iostream>
 #include <cstring>
 #include <map>
+#include <set>
 using namespace std;
 
 class A {
@@ -166,7 +167,7 @@ int main6()
     return 0;
 }
 
-int main() {
+int main7() {
     map<int, string> myMap;
     myMap.insert(pair<int, string>(1, "one"));
     myMap[1] = "one_1";
@@ -177,3 +178,52 @@ int main() {
     }
     return 0;
 }
+
+
+
+//仿函数
+struct MyFunctor {
+    void operator()(int x) {
+        cout << "MyFunctor called with value: " << x << endl;
+    }
+};
+
+class functor {
+    public:
+    int operator()(int x, int y) {
+        return x + y;
+    }
+
+};
+
+int main8() {
+    
+    functor f;
+    int result = f(3, 4); // 调用仿函数
+    cout << "Result: " << result << endl;
+
+    MyFunctor functor;
+    functor(42); // 调用仿函数
+
+    return 0;
+}
+
+
+//仿函数（Functor）类型
+struct MyFunctor2 {
+    bool operator()(const int &x, const int &y) const{
+        return (x > y); // 重载operator()，实现降序排列
+    }
+};
+
+int main() {
+    set<int, MyFunctor2> mySet;
+    mySet.insert(3);
+    mySet.insert(1);
+    mySet.insert(4);
+
+    for (const auto &elem : mySet) {
+        cout << elem << " ";
+    }
+}
+
