@@ -1,5 +1,6 @@
 #include <iostream>
 #include <cstring>
+#include <map>
 using namespace std;
 
 class A {
@@ -154,7 +155,7 @@ public:
     }
 };
 
-int main()
+int main6()
 {
     MyClass<int> obj1;
     obj1.fun(10);
@@ -162,5 +163,17 @@ int main()
     MyClass2<const char*> obj2;
     obj2.fun("Hello");
 
+    return 0;
+}
+
+int main() {
+    map<int, string> myMap;
+    myMap.insert(pair<int, string>(1, "one"));
+    myMap[1] = "one_1";
+    myMap[2] = "two";
+
+    for (map<int, string>::iterator it = myMap.begin(); it != myMap.end(); ++it) {
+        cout << it->first << ": " << it->second << endl;
+    }
     return 0;
 }
