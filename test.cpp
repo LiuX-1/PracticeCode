@@ -1,4 +1,5 @@
 #include <iostream>
+#include <cstring>
 using namespace std;
 
 class A {
@@ -119,7 +120,7 @@ public:
     }
 };
 
-int main()
+int main4()
 {
     base* b = new derived;
     derived* d = new derived;
@@ -131,3 +132,35 @@ int main()
 }
 
 // 因为每个对象内部都有一个隐藏的指针（vptr），指向一张虚函数表（vtable）。当基类析构函数是虚函数时，delete 操作会通过这个指针，在运行时找到当前对象真正的类型，从而调用正确的析构函数。
+
+
+template <typename T>
+class MyClass {
+public:
+    int tmp;
+    void fun(T val) {
+        tmp = val;
+        cout << "tmp: " << tmp << endl;
+    }
+};
+
+template <typename T>
+class MyClass2 {
+public:
+    char a[100];
+    void fun(T val) {
+        strcpy(a, val);
+        printf("tmp: %s\n", a);
+    }
+};
+
+int main()
+{
+    MyClass<int> obj1;
+    obj1.fun(10);
+
+    MyClass2<const char*> obj2;
+    obj2.fun("Hello");
+
+    return 0;
+}
