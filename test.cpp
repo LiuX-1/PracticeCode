@@ -249,7 +249,7 @@ int main10() {
 //shared_ptr 通过引用计数来管理资源：每多一个 shared_ptr 指向同一对象，计数器 +1；每销毁一个，计数器 -1。当计数器归零时，自动释放资源。
 
 int main11() {
-    shared_ptr<int> p1 = make_shared<int>(42);
+    shared_ptr<int> p1 = make_shared<int>(42);     //shared_ptr<int> p1(new int(42));
     shared_ptr<int> p2 = p1;  // ✅ 可以拷贝，引用计数变为 2
 
     cout << *p1 << endl;      // 42
