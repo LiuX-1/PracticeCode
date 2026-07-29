@@ -2,6 +2,7 @@
 #include <cstring>
 #include <map>
 #include <set>
+#include <memory>
 using namespace std;
 
 class A {
@@ -216,7 +217,7 @@ struct MyFunctor2 {
     }
 };
 
-int main() {
+int main9() {
     set<int, MyFunctor2> mySet;
     mySet.insert(3);
     mySet.insert(1);
@@ -227,3 +228,53 @@ int main() {
     }
 }
 
+
+//unique_ptr 是轻量级的智能指针，它独占所管理的对象，不能被拷贝，只能被移动。
+class MyClass {
+public:
+    ~MyClass() { cout << "析构" << endl; }
+};
+
+int main10() {
+    unique_ptr<MyClass> p1 = make_unique<MyClass>();  // C++14 起推荐
+    // unique_ptr<MyClass> p2 = p1;  // ❌ 编译错误！不能拷贝
+    unique_ptr<MyClass> p2 = std::move(p1);  // ✅ 可以转移所有权
+
+    // p1 现在为空，p2 拥有对象
+    if (!p1) cout << "p1 为空" << endl;
+    // 离开作用域时，p2 自动析构，释放内存
+    return 0;
+}
+
+//shared_ptr 通过引用计数来管理资源：每多一个 shared_ptr 指向同一对象，计数器 +1；每销毁一个，计数器 -1。当计数器归零时，自动释放资源。
+
+int main11() {
+    shared_ptr<int> p1 = make_shared<int>(42);
+    shared_ptr<int> p2 = p1;  // ✅ 可以拷贝，引用计数变为 2
+
+    cout << *p1 << endl;      // 42
+    cout << p1.use_count() << endl;  // 2
+
+    p2.reset();               // 释放 p2，引用计数变为 1
+    // 离开作用域时，p1 销毁，引用计数归零，释放内存
+    return 0;
+}
+
+
+//weak_ptr 不参与引用计数，它像一个“观察者”，可以访问 shared_ptr 管理的资源，但不会阻止资源释放。
+
+struct Node {
+    shared_ptr<Node> next;
+    // weak_ptr<Node> next;   // 改为 weak_ptr 即可打破循环
+    ~Node() { cout << "Node 析构" << endl; }
+};
+
+int main12() {
+    auto n1 = make_shared<Node>();
+    auto n2 = make_shared<Node>();
+    n1->next = n2;
+    n2->next = n1;   // 循环引用！两个对象永远不会被释放
+
+    // 如果把其中一个改成 weak_ptr，就能正常析构
+    return 0;
+}
