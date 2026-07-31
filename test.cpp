@@ -278,3 +278,23 @@ int main12() {
     // 如果把其中一个改成 weak_ptr，就能正常析构
     return 0;
 }
+
+
+
+
+class MyClass {
+public:
+    ~MyClass() { cout << "析构" << endl; }
+};
+
+int main() {
+    MyClass* arr = new MyClass[3];
+    delete[] arr;   // 输出三次 "析构"，每个元素都被正确析构
+
+    MyClass* obj = new MyClass();
+    delete obj;     // 输出一次 "析构"
+
+    // 错误示例（不要这样做）：
+    // MyClass* arr2 = new MyClass[3];
+    // delete arr2;  // 未定义行为！可能只析构第一个元素，或直接崩溃
+}
