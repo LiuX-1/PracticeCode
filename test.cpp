@@ -3,6 +3,7 @@
 #include <map>
 #include <set>
 #include <memory>
+#include <vector>
 using namespace std;
 
 class A {
@@ -343,3 +344,47 @@ int main() {
     // MyClass* arr2 = new MyClass[3];
     // delete arr2;  // 未定义行为！可能只析构第一个元素，或直接崩溃
 }
+
+
+
+
+//纯虚函数 及 多态应用
+
+// 定义接口
+class Drawable {
+public:
+    virtual void draw() const = 0;
+    virtual ~Drawable() = default;  // 虚析构函数
+};
+
+// 实现接口
+class Circle : public Drawable {
+public:
+    void draw() const override { cout << "画圆" << endl; }
+};
+
+class Rectangle : public Drawable {
+public:
+    void draw() const override { cout << "画矩形" << endl; }
+};
+
+int main() {
+    // Drawable d;  // ❌ 错误！不能实例化抽象类
+
+    vector<Drawable*> shapes;
+    shapes.push_back(new Circle());    //此处体现父类指针指向子类对象
+    shapes.push_back(new Rectangle());
+
+    for (auto* s : shapes) {
+        s->draw();   // ✅ 多态调用
+    }
+    return 0;
+}
+
+
+// 虚函数是怎么实现的
+// 每一个含有虚函数的类都至少有有一个与之对应的虚函数表，其中存放着该类所有虚函数对应的函数指针（地址），
+
+// 类的示例对象不包含虚函数表，只有虚指针；
+
+// 派生类会生成一个兼容基类的虚函数表。
