@@ -276,15 +276,15 @@ int main9() {
 
 
 //unique_ptr 是轻量级的智能指针，它独占所管理的对象，不能被拷贝，只能被移动。
-class MyClass {
+class MyClassUnique {
 public:
-    ~MyClass() { cout << "析构" << endl; }
+    ~MyClassUnique() { cout << "析构" << endl; }
 };
 
 int main10() {
-    unique_ptr<MyClass> p1 = make_unique<MyClass>();  // C++14 起推荐
-    // unique_ptr<MyClass> p2 = p1;  // ❌ 编译错误！不能拷贝
-    unique_ptr<MyClass> p2 = std::move(p1);  // ✅ 可以转移所有权
+    unique_ptr<MyClassUnique> p1 = make_unique<MyClassUnique>();  // C++14 起推荐
+    // unique_ptr<MyClassUnique> p2 = p1;  // ❌ 编译错误！不能拷贝
+    unique_ptr<MyClassUnique> p2 = std::move(p1);  // ✅ 可以转移所有权
 
     // p1 现在为空，p2 拥有对象
     if (!p1) cout << "p1 为空" << endl;
@@ -328,20 +328,20 @@ int main12() {
 
 
 
-class MyClass {
+class MyClassArray {
 public:
-    ~MyClass() { cout << "析构" << endl; }
+    ~MyClassArray() { cout << "析构" << endl; }
 };
 
-int main() {
-    MyClass* arr = new MyClass[3];
+int main14() {
+    MyClassArray* arr = new MyClassArray[3];
     delete[] arr;   // 输出三次 "析构"，每个元素都被正确析构
 
-    MyClass* obj = new MyClass();
+    MyClassArray* obj = new MyClassArray();
     delete obj;     // 输出一次 "析构"
 
     // 错误示例（不要这样做）：
-    // MyClass* arr2 = new MyClass[3];
+    // MyClassArray* arr2 = new MyClassArray[3];
     // delete arr2;  // 未定义行为！可能只析构第一个元素，或直接崩溃
 }
 
@@ -368,7 +368,7 @@ public:
     void draw() const override { cout << "画矩形" << endl; }
 };
 
-int main() {
+int main13() {
     // Drawable d;  // ❌ 错误！不能实例化抽象类
 
     vector<Drawable*> shapes;
@@ -417,3 +417,79 @@ int main() {
 // 2）当函数的参数是类的对象时，就是值传递的时候，如果是引用传递则不会调用
 
 // 3）当函数的返回值是类的对象或者引用的时候
+
+
+
+
+
+// 全局变量在整个文件（甚至整个程序）中可见
+
+// global.cpp
+
+// cpp
+// // 定义全局变量
+// int g_counter = 0;
+// other.cpp
+
+// cpp
+// // 声明全局变量（不分配内存，只告诉编译器“这个变量存在”）
+// extern int g_counter;
+
+// void func() {
+//     g_counter++;   // ✅ 可以访问，修改的是 global.cpp 中定义的那个变量
+// }
+
+
+
+// 对比：静态全局变量
+// 如果给全局变量加上 static 修饰，它的作用域就会被限制在当前文件内：
+
+// cpp
+// // global.cpp
+// static int s_hidden = 42;   // 只在 global.cpp 中可见
+
+
+int main15(){
+    vector<int> vec(10);  //有这种构造函数
+    cout << vec.size() << endl;
+    cout << vec[0] << endl;
+    return 0;
+}
+
+
+
+//友元函数和友元类
+
+class MyClassFriend {
+private:
+    int tmp;
+public:
+    MyClassFriend(int val) : tmp(val) {}
+    friend int printTmp(const MyClassFriend& obj);  // 声明友元函数    
+};
+
+int printTmp(const MyClassFriend& obj) {
+    cout << "tmp: " << obj.tmp << endl;  // 可以访问私有成员
+    return 0;
+}
+
+int main() {
+    MyClassFriend obj(42);
+    printTmp(obj);
+    return 0;
+}
+
+
+//友元类
+class A0805 {
+private:
+    int data = 10;
+    friend class B0805;   // 声明 B 是 A 的友元类
+};
+
+class B0805 {
+public:
+    void showA(const A0805& a) {
+        cout << a.data << endl;  // ✅ B 的所有函数都能访问 A 的私有成员
+    }
+};
