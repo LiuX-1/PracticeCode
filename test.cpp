@@ -583,3 +583,116 @@ public:
 //     unsigned int value  : 6;   // 占6位
 // };
 // 这里 Status 只占 1 个字节（8位），而不是 3 个 int（12 字节）。这在嵌入式开发或网络协议解析中非常实用。
+
+
+
+// 什么是组合？
+// 1)一个类里面的数据成员是另一个类的对象，即内嵌其他类的对象作为自己的成员；
+// 创建组合类的对象：首先创建各个内嵌对象，难点在于构造函数的设计。
+// 创建对象时既要对基本类型的成员进行初始化，又要对内嵌对象进行初始化。 
+// 2)创建组合类对象，构造函数的执行顺序：先调用内嵌对象的构造函数，
+// 然后按照内嵌对象成员在组合类中的定义顺序，与组合类构造函数的初始化列表顺序无关。
+// 然后执行组合类构造函数的函数体，析构函数调用顺序相反。
+
+class Engine {
+public:
+    int tmp;
+    Engine() { cout << "Engine 构造" << endl; }
+    Engine(int val) {
+        tmp = val;
+        cout << "Engine 带参构造" << endl;
+    }
+    // Engine(int val) : tmp(val) {
+    //     cout << "Engine 带参构造" << endl;
+    // }
+    ~Engine() { cout << "Engine 析构" << endl; }
+};
+
+class Wheel {
+public:
+    int tmp;
+    Wheel() { cout << "Wheel 构造" << endl; }
+    Wheel(int val) {
+        tmp = val;
+        cout << "Wheel 带参构造" << endl;
+    }
+    ~Wheel() { cout << "Wheel 析构" << endl; }
+};
+
+class Car {
+private:
+    Engine engine;   // Car 拥有一个 Engine 对象（组合）
+    Wheel wheel;     // Car 拥有一个 Wheel 对象（组合）
+public:
+    Car() { cout << "Car 构造" << endl; }
+    ~Car() { cout << "Car 析构" << endl; }
+};
+
+// 如果组合类的构造函数需要通过初始化列表向成员对象传递参数，写法如下：
+class Car2 {
+private:
+    Engine engine;
+    Wheel wheel;
+public:
+    // engine(2000) 表示调用 Engine 的带参构造函数，传递参数 2000
+    Car2() : engine(2000), wheel(18) {
+        cout << "Car2 构造" << endl;
+    }
+};
+// 这时候，engine(2000) 和 wheel(18) 在初始化列表中的顺序，
+// 仍然不会改变 engine 和 wheel 的实际构造顺序（由声明顺序决定）。
+
+
+// 初始化列表
+// 初始化列表有两种完全不同的用法，一种在类里面（构造函数初始化列表），另一种在类外面（变量定义时）。
+
+// 两种“初始化列表”的本质区别
+// 对比维度	构造函数初始化列表	统一初始化（{} 初始化变量）
+// 使用位置	只在类的构造函数定义中	在任何变量定义的地方（函数内、全局、类成员定义等）
+// 语法形式	ClassName(参数) : 成员1(值), 成员2(值) { }	int a{10}; vector<int> v{1,2,3};
+// 核心目的	初始化类的成员变量（尤其是 const、引用、无默认构造的成员）	初始化任意变量（基础类型、数组、结构体、容器）
+// 能否在类外使用	❌ 只能在类定义内部使用	✅ 可以在任何地方使用
+
+
+class MyClass0810 {
+private:
+    const int id;       // const 成员
+    int& ref;           // 引用成员
+    std::string name;
+public:
+    // ✅ 这里用的是"构造函数初始化列表"，只能在类里面
+    MyClass0810(int i, int& r, const std::string& n)
+        : id(i), ref(r), name(n) {   // ← 这是构造函数初始化列表
+    }
+};
+
+
+struct Point {
+    int x;
+    int y;
+};
+
+int main0810() {
+    // ✅ 定义变量时使用 {} 初始化，可以在任何地方
+    int a{10};                     // 基础类型
+    int arr[3]{1, 2, 3};           // 数组
+    std::vector<int> v{1, 2, 3};   // 容器
+    Point p{10, 20};               // 结构体
+
+    int b = 5;
+    MyClass0810 obj{5, b, "hello"};  // 也可以用于类对象
+}
+
+
+//  一个常见的混淆点
+// 如果看到类定义中成员变量直接使用 {} 初始化，这既不是构造函数初始化列表，也不是普通的变量初始化，而是 C++11 引入的类内成员初始化器（In-class Member Initializer）：
+
+class MyClass08101 {
+private:
+    int a{10};        // ✅ 类内成员初始化器（不是构造函数初始化列表）
+    int b = 20;       // ✅ 也支持 = 语法
+public:
+    MyClass08101() {}      // a 和 b 都会被初始化为 10 和 20
+};
+
+// 这种用花括号 {} 初始化变量的语法，确实是在 C++11 标准中才被正式引入，并作为一项核心新特性推广开来的
