@@ -473,7 +473,7 @@ int printTmp(const MyClassFriend& obj) {
     return 0;
 }
 
-int main() {
+int main123() {
     MyClassFriend obj(42);
     printTmp(obj);
     return 0;
@@ -696,3 +696,12 @@ public:
 };
 
 // 这种用花括号 {} 初始化变量的语法，确实是在 C++11 标准中才被正式引入，并作为一项核心新特性推广开来的
+
+
+
+//确认编译环境是否支持c++11
+
+int main() {
+    cout << "c++ version" << __cplusplus << endl;
+    return 0;
+}
