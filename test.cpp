@@ -748,3 +748,55 @@ int main0811() {
     // int a[5] = {10, 20, 30, 40, 50};
     
     // cout << *(a + 1) << endl;   // 输出 20
+
+
+
+// 拷贝构造函数（Copy Constructor）
+// 触发时机：对象被创建时，用另一个同类型对象来初始化它。
+
+
+class MyClass0812 {
+public:
+    // 拷贝构造函数的典型签名
+    MyClass0812(const MyClass0812& other) {
+        // 执行深拷贝或其他初始化逻辑
+    }
+};
+
+int main0812_2() {
+    MyClass0812 obj1;
+    MyClass0812 obj2 = obj1;   // ✅ 调用拷贝构造函数（obj2 刚被创建）
+    MyClass0812 obj3(obj1);    // ✅ 调用拷贝构造函数（obj3 刚被创建）
+    return 0;
+}
+// 何时会调用拷贝构造？
+
+// 用一个对象初始化另一个对象（如 obj2 = obj1 在定义时）。
+
+// 函数按值传递对象（void func(MyClass obj)）。
+
+// 函数按值返回对象（MyClass func()）。
+
+
+// 赋值运算符重载（Copy Assignment Operator）
+// 触发时机：两个对象都已经存在，将一个对象的值赋给另一个对象。
+
+class MyClass0812_2 {
+public:
+    // 赋值运算符重载的典型签名
+    MyClass0812_2& operator=(const MyClass0812_2& other) {
+        if (this != &other) {   // 防止自赋值
+            // 执行深拷贝或其他赋值逻辑
+        }
+        return *this;
+    }
+};
+
+int main0812_2() {
+    MyClass0812_2 obj1;
+    MyClass0812_2 obj2;
+    obj2 = obj1;   // ✅ 调用赋值运算符重载（obj2 已存在）
+    return 0;
+}
+// 关键点：obj2 = obj1; 只有在 obj2 已经存在时，才会调用赋值运算符。
+// 如果 obj2 是在这行代码中刚被定义，则会调用拷贝构造函数。
