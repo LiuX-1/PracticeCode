@@ -272,6 +272,7 @@ int main9() {
     for (const auto &elem : mySet) {
         cout << elem << " ";
     }
+    return 0;
 }
 
 
@@ -343,6 +344,7 @@ int main14() {
     // 错误示例（不要这样做）：
     // MyClassArray* arr2 = new MyClassArray[3];
     // delete arr2;  // 未定义行为！可能只析构第一个元素，或直接崩溃
+    return 0;
 }
 
 
@@ -681,6 +683,7 @@ int main0810() {
 
     int b = 5;
     MyClass0810 obj{5, b, "hello"};  // 也可以用于类对象
+    return 0;
 }
 
 
@@ -757,6 +760,9 @@ int main0811() {
 
 class MyClass0812 {
 public:
+    MyClass0812() {
+        // 默认构造函数
+    }
     // 拷贝构造函数的典型签名
     MyClass0812(const MyClass0812& other) {
         // 执行深拷贝或其他初始化逻辑
@@ -792,7 +798,7 @@ public:
     }
 };
 
-int main0812_2() {
+int main0812_2_sub() {
     MyClass0812_2 obj1;
     MyClass0812_2 obj2;
     obj2 = obj1;   // ✅ 调用赋值运算符重载（obj2 已存在）
@@ -952,3 +958,22 @@ int main0812_3() {
 
 // 在实际设计中，优先考虑组合/聚合，而不是继承，因为继承会带来更高的耦合度。
 // 而组合和聚合中，优先选择组合还是聚合，则取决于部分是否需要脱离整体独立存在。
+
+
+
+// 简述数组与指针的区别？
+int funtest(char * p) {
+    cout << sizeof(p) << endl;  // 输出 8（在64位系统上，指针大小为8字节）
+    return 0;
+}
+
+int main0813() {
+    char a[10] = "hello";
+    char * p = a;
+    cout << sizeof(a) << endl;  // 输出 10
+    cout << sizeof(p) << endl;  // 输出 8（在64位系 统上，指针大小为8字节）
+    funtest(p);
+    return 0;
+}
+
+//简单说就是，sizeof数组名，则拿到的是数组大小。 如果通过函数参数将数组名传进来然后sizeof这个指针，则拿到的是指针大小。因为数组名在函数参数中会退化为指针类型。
