@@ -1085,3 +1085,120 @@ int main0813() {
 // MyClass b = func();     // 自动触发移动构造（或 RVO 优化）
 
 // 注意，如果类没有定义移动构造函数，编译器不会自动生成一个并调用它，而是会退而求其次，调用拷贝构造函数（如果存在的话）。
+
+
+
+//单例模式- 懒汉式
+
+//懒汉式
+class Singelton
+{
+private:
+	Singelton()
+	{
+		cout << "Singelton 构造函数执行" << endl;
+	}
+public:
+	static Singelton *getInstance()
+	{
+		if (m_psl == NULL)
+		{
+			m_psl = new Singelton;
+		}
+		return m_psl;
+	}
+
+	static void FreeInstance()
+	{
+		if (m_psl != NULL)
+		{
+			delete m_psl;
+			m_psl = NULL; 
+		}
+	}
+
+private:
+	static Singelton *m_psl;
+};
+
+Singelton *Singelton::m_psl = NULL;
+
+
+void main041()
+{
+	
+	Singelton *p1 = Singelton::getInstance();
+	Singelton *p2 = Singelton::getInstance();
+
+	if (p1 == p2)
+	{
+		cout << "是同一个对象" << endl;
+	}
+	else
+	{
+		cout << "不是同一个对象" << endl;
+	}
+	Singelton::FreeInstance();
+
+	
+	return ;
+}
+
+
+
+
+
+//饿汉式
+class Singelton
+{
+private:
+	Singelton()
+	{
+		cout << "Singelton 构造函数执行" << endl;
+	}
+public:
+	static Singelton *getInstance()
+	{
+		return m_psl;
+	}
+
+	static void FreeInstance()
+	{
+		if (m_psl != NULL)
+		{
+			delete m_psl;
+			m_psl = NULL; 
+		}
+	}
+
+private:
+	static Singelton *m_psl;
+};
+
+//int g_count = 0;
+//饿汉式
+Singelton *Singelton::m_psl = new Singelton;
+
+
+void main041()
+{
+	printf("sss\n");
+	Singelton *p1 = Singelton::getInstance();
+	Singelton *p2 = Singelton::getInstance();
+
+	if (p1 == p2)
+	{
+		cout << "是同一个对象" << endl;
+	}
+	else
+	{
+		cout << "不是同一个对象" << endl;
+	}
+	Singelton::FreeInstance();
+
+	return ;
+}
+
+//这里的 instance 是一个静态成员变量。它的初始化会在 main 函数开始之前完成，且只执行一次。
+
+// 所以，当你的程序进入 main() 时，这个唯一的 Singleton 对象已经静静地躺在内存里了。
