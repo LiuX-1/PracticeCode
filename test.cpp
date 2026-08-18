@@ -1202,3 +1202,30 @@ void main041()
 //这里的 instance 是一个静态成员变量。它的初始化会在 main 函数开始之前完成，且只执行一次。
 
 // 所以，当你的程序进入 main() 时，这个唯一的 Singleton 对象已经静静地躺在内存里了。
+
+
+
+//单例模式    不用new   懒汉模式
+
+class Singleton {
+private:
+    Singleton() = default;                 // 私有构造
+    ~Singleton() = default;                // 私有析构（可选）
+    Singleton(const Singleton&) = delete;
+    Singleton& operator=(const Singleton&) = delete;
+
+public:
+    static Singleton& getInstance() {
+        static Singleton instance;          // 核心：函数内的静态变量
+        return instance;
+    }
+
+    void doSomething() const {
+        // ...
+    }
+};
+
+int main() {
+    Singleton& s = Singleton::getInstance();
+    s.doSomething();
+}
