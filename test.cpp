@@ -1388,7 +1388,7 @@ public:
 
 
 
-void main()
+void main0820_1()
 {
 	AbFactory		*factory = NULL;
 	Fruit			*fruit = NULL;
