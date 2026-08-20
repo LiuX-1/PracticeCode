@@ -1395,7 +1395,7 @@ void main0820_1()
 
 	//吃 香蕉
 	factory = new BananaFactory;
-	fruit = factory->CreateProduct();
+	fruit = factory->CreateProduct();   //多态，父类指针指向子类对象，然后下一步这个指针调用子类的sayname()方法
 	fruit->sayname();
 
 	delete fruit;
