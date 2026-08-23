@@ -1539,3 +1539,50 @@ void main()
 模板方法	⭐⭐⭐	行为型
 建造者模式	⭐⭐	创建型
 代理模式	⭐⭐	结构型
+
+
+
+//结构型模式， 代理模式
+class Subject
+{
+public:
+	virtual void sailbook() = 0;
+};
+
+class RealSubjectBook : public Subject
+{
+public:
+	virtual void sailbook()
+	{
+		cout << "卖书" << endl;
+	}
+};
+
+//a中包含b类；a、b类实现协议类protocol 
+class dangdangProxy : public Subject
+{
+public:
+	virtual void sailbook()
+	{
+		RealSubjectBook *rsb = new RealSubjectBook;
+		dazhe();
+		rsb->sailbook();
+		dazhe();
+	}
+public:
+	void dazhe()
+	{
+		cout << "双十一打折" << endl;
+	}
+private:
+	Subject *m_subject;
+};
+
+void main()
+{
+	Subject *s = new dangdangProxy;
+	s->sailbook();
+	delete s;
+	system("pause");
+	return ;
+}
