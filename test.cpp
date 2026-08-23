@@ -1586,3 +1586,50 @@ void main()
 	system("pause");
 	return ;
 }
+
+
+//子类中的拷贝构造函数
+//子类对象初始化父类对象
+class Base {
+private:
+    int i;
+public:
+    Base(int val) : i(val) {}
+    Base(const Base& other) : i(other.i) {}   // 基类拷贝构造
+};
+
+class Derived : public Base {
+private:
+    int j;
+public:
+    Derived(int a, int b) : Base(a), j(b) {}
+    
+    // 拷贝构造：用 obj 的 Base 部分初始化 Base，用 obj.j 初始化 j
+    Derived(const Derived& obj) : Base(obj), j(obj.j) {}      //用子类初始化基类
+};
+
+
+//基类不能直接初始化子类
+class Base {
+private:
+    int i;
+public:
+    Base(int val) : i(val) {}
+};
+
+class Derived : public Base {
+private:
+    int j;
+public:
+    Derived(int a, int b) : Base(a), j(b) {}
+};
+
+int main() {
+    Derived d1(1, 2);
+    Base b1 = d1;          // ✅ 可以：用子类给基类赋值（切片）
+    
+    Base b2(10);
+    // Derived d2 = b2;    // ❌ 编译错误：无法用基类对象初始化子类
+    // Derived d3(b2);     // ❌ 编译错误：同样不行
+    return 0;
+}
