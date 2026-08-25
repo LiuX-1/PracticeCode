@@ -1674,7 +1674,7 @@ public:
 	}
 protected:
 private:
-	Car *m_car;
+	Car *m_car;    //装饰器都有一个基类的指针成员，指向被装饰对象flycar
 };
 
 class  FlyCarDirector : public Car
@@ -1690,16 +1690,16 @@ public:
 	}
 	virtual void show()
 	{
-		m_car->show();
-		fly();
+		m_car->show();    //父类指针m_car调用虚函数show，实际调用的是子类RunCar的show方法
+		fly();            //增加装饰类的功能
 	}
 
 private:
 	Car *m_car;    //has-a 关系
 };
 
-void main()
-{
+void main()    //这个例子跟下面那个装饰模式列子的一个缺少的功能点是，没有实现一个装饰类继承另一个装饰类的功能。 也就是没有实现一环套一环的功能。 下面那个例子实现了这个功能。
+{                                                                //上面这句话不对，下面那个例子只是在实现接口，跟上面这个例子本质还是一样的。下面那个没有做一个装饰类继承另一个装饰类的事。
 	Car * mycar = NULL;
 	mycar = new RunCar;
 	printf("-----000\n");
@@ -1707,12 +1707,12 @@ void main()
 
 	printf("-----aaa\n");
 
-	FlyCarDirector *flycar = new FlyCarDirector(mycar);
+	FlyCarDirector *flycar = new FlyCarDirector(mycar);     //has-a 关系， 除了可以run还能fly
 	flycar->show();
 
 	printf("-----bbb\n");
 	SwimCarDirector *swimcar = new SwimCarDirector(flycar);
-	swimcar->show();
+	swimcar->show();    //此处输出run fly swim，说明一环套一环的功能实现了。 也就是装饰类继承另一个装饰类的功能实现了。 
 	
 	delete swimcar;
 	delete flycar;
@@ -1721,6 +1721,7 @@ void main()
 	return ;
 }
 
+//上下这两个例子都能实现一环套一环的功能，区别是上面那个例子没有实现装饰类继承另一个装饰类的功能（重新看了下，这句话描述不对），下面这个例子实现了这个功能。 也就是下面这个例子更符合装饰模式的定义。
 
 // 关键点（面试回答的核心）
 // 面试官问“装饰模式的关键点”时，通常期望你答出以下三点：
@@ -1763,11 +1764,11 @@ public:
 // 装饰器基类：持有一个指向抽象组件的指针
 class StreamDecorator : public Stream {
 protected:
-    Stream* stream;
+    Stream* stream;       //装饰器都有一个基类的指针成员，指向被装饰对象
 public:
-    StreamDecorator(Stream* s) : stream(s) {}
+    StreamDecorator(Stream* s) : stream(s) {}     //初始化列表，相当于Stream* stream = file
     void write(const string& data) override {
-        stream->write(data);   // 委托给被装饰对象
+        stream->write(data);   // 委托给被装饰对象       //父类指针stream调用虚函数write，实际调用的是子类FileStream的write方法
     }
 };
 
@@ -1777,9 +1778,10 @@ public:
     EncryptedStream(Stream* s) : StreamDecorator(s) {}
     void write(const string& data) override {
         string encrypted = "加密(" + data + ")";
-        stream->write(encrypted);   // 先加密，再写入
+        stream->write(encrypted);   // 先加密，再写入   //此处也是多态，父类指针stream调用虚函数
     }
-};
+};    //具体装饰器 不包含stream成员。 通过Stream* s父类指针，指向子类对象buffered，实现对StreamDecorator的实例化。
+      // 然后EncryptedStream类的write方法调用父类StreamDecorator的write方法，传入加密后的数据，实现了对原始写入功能的增强。
 
 // 具体装饰器B：缓冲功能
 class BufferedStream : public StreamDecorator {
@@ -1805,3 +1807,25 @@ int main() {
     
     return 0;
 }
+
+
+// 所以更准确的理解是
+// 时刻	发生的事情	说明
+// 构造时	Stream* s = &buffered;	父类指针指向子类对象（你指出的那点）
+// 调用时	stream->write(...)	用这个父类指针调用虚函数（多态的实际表现）
+// 构造时是指针的“赋值时刻”，调用时是指针的“使用时刻”。
+//    两者是同一个指针在不同阶段的表现，共同构成了装饰模式中多态的基础。
+
+// “一环套一环”，这恰恰是装饰模式（Decorator Pattern）最精髓，也最让人头疼的地方。
+
+
+// 自己的理解，装饰模式，就跟套娃一样，一层包一层，下一层基于已有的上一层做包装。 然后如果直接实例化最外边一层，里面的也就都会有了。
+
+// 你理解得对的地方
+// “一层包一层” → 装饰器通过组合，把多个功能层叠在一起。
+
+// “下一层基于已有的上一层做包装” → 每个装饰器在调用内层对象的基础上，添加自己的功能。
+
+// “实例化最外边一层，里面的也就都有了” → 只需要持有最外层的对象，调用它的方法时，整条链会自动执行。
+
+// 你用“套娃”来理解装饰模式，说明你已经抓住了它的本质：层层包装、逐层委托、灵活组合。这个理解比很多只是背概念的人要深刻得多。
