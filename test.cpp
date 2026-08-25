@@ -1720,3 +1720,88 @@ void main()
 	system("pause");
 	return ;
 }
+
+
+// 关键点（面试回答的核心）
+// 面试官问“装饰模式的关键点”时，通常期望你答出以下三点：
+
+// 动态组合，而非静态继承
+
+// 继承是在编译时确定的，而装饰器是在运行时组合的。你可以灵活地叠加多个装饰器，顺序也可以调整。
+
+// 例如：new EncryptedStream(new BufferedStream(new FileStream("a.txt"))) 同时具备缓冲和加密功能。
+
+// 透明性
+
+// 装饰器和被装饰对象继承自同一个抽象接口，客户代码无需区分是原始对象还是被装饰过的对象。
+
+// 对客户端来说，调用方式完全一致。
+
+// 符合开闭原则
+
+// 新增功能无需修改现有类，只需新增一个装饰器类即可。这是“对扩展开放，对修改关闭”的典型体现。
+
+
+
+//继续看装饰模式
+
+// 抽象组件：定义读取/写入数据的接口
+class Stream {
+public:
+    virtual void write(const string& data) = 0;
+    virtual ~Stream() = default;
+};
+
+// 具体组件：核心功能（文件流）
+class FileStream : public Stream {
+public:
+    void write(const string& data) override {
+        cout << "写入文件: " << data << endl;
+    }
+};
+
+// 装饰器基类：持有一个指向抽象组件的指针
+class StreamDecorator : public Stream {
+protected:
+    Stream* stream;
+public:
+    StreamDecorator(Stream* s) : stream(s) {}
+    void write(const string& data) override {
+        stream->write(data);   // 委托给被装饰对象
+    }
+};
+
+// 具体装饰器A：加密功能
+class EncryptedStream : public StreamDecorator {
+public:
+    EncryptedStream(Stream* s) : StreamDecorator(s) {}
+    void write(const string& data) override {
+        string encrypted = "加密(" + data + ")";
+        stream->write(encrypted);   // 先加密，再写入
+    }
+};
+
+// 具体装饰器B：缓冲功能
+class BufferedStream : public StreamDecorator {
+public:
+    BufferedStream(Stream* s) : StreamDecorator(s) {}
+    void write(const string& data) override {
+        string buffered = "缓冲(" + data + ")";
+        stream->write(buffered);
+    }
+};
+
+// 客户端代码
+int main() {
+    FileStream file;
+    
+    // 只加缓冲
+    BufferedStream buffered(&file);
+    buffered.write("Hello");   // 输出: 写入文件: 缓冲(Hello)
+    
+    // 缓冲 + 加密
+    EncryptedStream encrypted(&buffered);
+    encrypted.write("World");  // 输出: 写入文件: 缓冲(加密(World))
+    
+    return 0;
+}
