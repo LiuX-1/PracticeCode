@@ -1829,3 +1829,45 @@ int main() {
 // “实例化最外边一层，里面的也就都有了” → 只需要持有最外层的对象，调用它的方法时，整条链会自动执行。
 
 // 你用“套娃”来理解装饰模式，说明你已经抓住了它的本质：层层包装、逐层委托、灵活组合。这个理解比很多只是背概念的人要深刻得多。
+
+
+//适配器模式
+// 适配器模式（Adapter Pattern）通过引入一个适配器类，将一个类的接口转换成客户端期望的另一个接口，从而解决接口不兼容的问题。
+// 形象比喻：你有一台两孔插头的电器，但墙上只有三孔插座。适配器（转换插头）把三孔转成两孔，电器就能正常工作了。
+// 代码比喻：你有一个老旧的日志库，它的接口是 writeLog(msg)，但你的新系统期望的是 log(msg)。适配器把 log 调用转换成 writeLog 调用。
+
+// 被适配者：旧日志库（不兼容的接口）
+class OldLogger {
+public:
+    void writeLog(const string& msg) {
+        cout << "[旧日志] " << msg << endl;
+    }
+};
+
+// 目标接口：新系统期望的日志接口
+class Logger {
+public:
+    virtual void log(const string& msg) = 0;
+    virtual ~Logger() = default;
+};
+
+// 适配器：把 OldLogger 适配成 Logger 接口
+class LoggerAdapter : public Logger {
+private:
+    OldLogger* oldLogger;
+public:
+    LoggerAdapter(OldLogger* old) : oldLogger(old) {}
+
+    void log(const string& msg) override {
+        oldLogger->writeLog(msg);   // 把 log 调用转换成 writeLog
+    }
+};
+
+// 客户端代码（新系统）
+int main() {
+    OldLogger old;
+    Logger* logger = new LoggerAdapter(&old);
+    logger->log("系统启动成功");     // 输出: [旧日志] 系统启动成功
+    delete logger;
+    return 0;
+}
