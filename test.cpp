@@ -1852,11 +1852,11 @@ public:
 };
 
 // 适配器：把 OldLogger 适配成 Logger 接口
-class LoggerAdapter : public Logger {
+class LoggerAdapter : public Logger {   //基类是目标接口，子类是适配器类
 private:
     OldLogger* oldLogger;
 public:
-    LoggerAdapter(OldLogger* old) : oldLogger(old) {}
+    LoggerAdapter(OldLogger* old) : oldLogger(old) {}    // 构造函数接受被适配者的实例
 
     void log(const string& msg) override {
         oldLogger->writeLog(msg);   // 把 log 调用转换成 writeLog
@@ -1870,4 +1870,60 @@ int main() {
     logger->log("系统启动成功");     // 输出: [旧日志] 系统启动成功
     delete logger;
     return 0;
+}
+
+
+
+// 适配器模式 视频
+class Current18v
+{
+public:
+	void use18vCurrent()
+	{
+		cout << "使用18v的交流电" << endl;
+	}
+protected:
+private:
+};
+
+
+class Current220v
+{
+public:
+	void use220vCurrent()
+	{
+		cout << "使用220v的交流电" << endl;
+	}
+protected:
+private:
+};
+
+
+class Adapter : public Current18v    // 基类是目标接口，子类是适配器类
+{
+public:
+	Adapter(Current220v *p220v)      // 构造函数接受被适配者的实例
+	{
+		m_p220v = p220v;
+	}
+	void use18vCurrent()
+	{
+		cout << "adapter中使用电流" << endl;
+		m_p220v->use220vCurrent();
+	}
+protected:
+private:
+	Current220v *m_p220v;
+};
+
+void main()
+{
+	Current220v *p220v = new Current220v;
+	Adapter *padapter = new Adapter(p220v);
+	padapter->use18vCurrent();
+
+	delete p220v;
+	delete padapter;
+	system("pause");
+	return ;
 }
