@@ -2008,3 +2008,82 @@ void main()
 // 而是基类 MakeCar 中定义的 Make 函数。 但这个基类的 Make 函数内部，
 // 又调用了三个虚函数（MakeHead、MakeBody、MakeTail），
 // 这些虚函数在子类中被重写了，因此表现出了多态行为。
+
+
+
+//行为型--命令模式
+
+class Doctor
+{
+public:
+	void treat_eye()
+	{
+		cout << "医生 治疗 眼科病" << endl;
+	}
+
+	void treat_nose()
+	{
+		cout << "医生 治疗 鼻科病" << endl;
+	}
+};
+
+
+class CommandTreatEye
+{
+public:
+	CommandTreatEye(Doctor *doctor)
+	{
+		m_doctor = doctor;
+	}
+	void treat()
+	{
+		m_doctor->treat_eye();
+	}
+private:
+	Doctor *m_doctor;
+};
+
+
+class CommandTreatNose
+{
+public:
+	CommandTreatNose(Doctor *doctor)
+	{
+		m_doctor = doctor;
+	}
+	void treat()
+	{
+		m_doctor->treat_nose();
+	}
+private:
+	Doctor *m_doctor;
+};
+
+
+
+void main21_1()
+{
+	//1 医生直接看病
+	/*
+	Doctor *doctor = new Doctor ;
+	doctor->treat_eye();
+	delete doctor;
+	*/
+
+	//2 通过一个命令 医生通过 命令 治疗 治病
+	Doctor *doctor = new Doctor ;
+	CommandTreatEye * commandtreateye = new CommandTreatEye(doctor); //shift +u //转小写 shift+ctl + u转大写
+	commandtreateye->treat();
+	delete commandtreateye;
+	delete doctor;
+	return ;
+}
+
+
+void main()
+{
+	main21_1();
+	cout<<"hello..."<<endl;
+	system("pause");
+	return ;
+}
