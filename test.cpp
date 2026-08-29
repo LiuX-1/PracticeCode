@@ -2072,7 +2072,11 @@ void main21_1()
 
 	//2 通过一个命令 医生通过 命令 治疗 治病
 	Doctor *doctor = new Doctor ;
-	CommandTreatEye * commandtreateye = new CommandTreatEye(doctor); //shift +u //转小写 shift+ctl + u转大写
+	CommandTreatEye * commandtreateye = new CommandTreatEye(doctor); //shift +u //转小写 shift+ctl + u转大写  
+    //意义在于，医生不直接看病，而是通过命令来治疗病人。
+    // 也就是医生和病人之间有一个中间层，医生不直接接触病人，而是通过命令来治疗病人。
+    // 这样做的好处是，医生和病人之间的耦合度降低了。 也就是医生和病人之间的关系变得松散了。 医生和病人之间的关系变得灵活了。 医生和病人之间的关系变得可扩展了。
+
 	commandtreateye->treat();
 	delete commandtreateye;
 	delete doctor;
@@ -2083,6 +2087,182 @@ void main21_1()
 void main()
 {
 	main21_1();
+	cout<<"hello..."<<endl;
+	system("pause");
+	return ;
+}
+
+
+//命令模式-2
+
+class Doctor
+{
+public:
+	void treat_eye()
+	{
+		cout << "医生 治疗 眼科病" << endl;
+	}
+
+	void treat_nose()
+	{
+		cout << "医生 治疗 鼻科病" << endl;
+	}
+};
+
+class Command
+{
+public:
+	virtual void treat() = 0;
+};
+class CommandTreatEye : public Command
+{
+public:
+	CommandTreatEye(Doctor *doctor)
+	{
+		m_doctor = doctor;
+	}
+	void treat()
+	{
+		m_doctor->treat_eye();
+	}
+private:
+	Doctor *m_doctor;
+};
+
+
+class CommandTreatNose : public Command
+{
+public:
+	CommandTreatNose(Doctor *doctor)
+	{
+		m_doctor = doctor;
+	}
+	void treat()
+	{
+		m_doctor->treat_nose();
+	}
+private:
+	Doctor *m_doctor;
+};
+
+
+class BeautyNurse
+{
+public:
+	BeautyNurse(Command *command)
+	{
+		this->command = command;
+	}
+public:
+	void SubmittedCase() //提交病例 下单命令
+	{
+		command->treat();
+	}
+protected:
+private:
+	Command *command;
+};
+
+//护士长
+class HeadNurse 
+{
+public:
+	HeadNurse()
+	{
+		m_list.clear();
+	}
+	
+public:
+	void setCommand(Command *command)
+	{
+		m_list.push_back(command);
+	}
+	void SubmittedCase() //提交病例 下单命令
+	{
+		for (list<Command *>::iterator it=m_list.begin(); it!=m_list.end(); it++)
+		{
+			(*it)->treat();
+		}
+	}
+private:
+	list<Command *> m_list;
+};
+
+
+
+void main21_1()
+{
+	//1 医生直接看病
+	/*
+	Doctor *doctor = new Doctor ;
+	doctor->treat_eye();
+	delete doctor;
+	*/
+
+	//2 通过一个命令 医生通过 命令 治疗 治病
+	Doctor *doctor = new Doctor ;
+	Command * command = new CommandTreatEye(doctor); //shift +u //转小写 shift+ctl + u转大写
+	command->treat();
+	delete command;
+	delete doctor;
+	return ;
+}
+
+
+void main21_2()
+{
+	//3 护士提交简历 给以上看病
+	BeautyNurse		*beautynurse = NULL;
+	Doctor			*doctor = NULL;
+	Command			*command  = NULL;
+
+	doctor = new Doctor ;
+
+	//command = new CommandTreatEye(doctor); //shift +u //转小写 shift+ctl + u转大写
+	command = new CommandTreatNose(doctor); //shift +u //转小写 shift+ctl + u转大写
+	beautynurse = new BeautyNurse(command);
+	beautynurse->SubmittedCase();
+	
+	delete doctor;
+	delete command;
+	delete beautynurse;
+	return ;
+}
+
+
+//4 通过护士长 批量的下单命令
+void main21_3()
+{
+	//护士提交简历 给以上看病
+	HeadNurse		*headnurse = NULL;
+	Doctor			*doctor = NULL;
+	Command			*command1  = NULL;
+	Command			*command2  = NULL;
+
+	doctor = new Doctor ;
+
+	command1 = new CommandTreatEye(doctor); //shift +u //转小写 shift+ctl + u转大写
+	command2 = new CommandTreatNose(doctor); //shift +u //转小写 shift+ctl + u转大写
+
+	headnurse = new HeadNurse(); //new 护士长
+	headnurse->setCommand(command1);
+	headnurse->setCommand(command2);
+
+	headnurse->SubmittedCase(); // 护士长 批量下单命令
+
+	delete doctor;
+	delete command1;
+	delete command2;
+	delete headnurse;
+	return ;
+}
+
+
+void main()
+{
+	//main21_1();
+	//main21_2();
+	main21_3();
 	cout<<"hello..."<<endl;
 	system("pause");
 	return ;
