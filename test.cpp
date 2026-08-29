@@ -2076,13 +2076,30 @@ void main21_1()
     //意义在于，医生不直接看病，而是通过命令来治疗病人。
     // 也就是医生和病人之间有一个中间层，医生不直接接触病人，而是通过命令来治疗病人。
     // 这样做的好处是，医生和病人之间的耦合度降低了。 也就是医生和病人之间的关系变得松散了。 医生和病人之间的关系变得灵活了。 医生和病人之间的关系变得可扩展了。
-
 	commandtreateye->treat();
 	delete commandtreateye;
 	delete doctor;
 	return ;
 }
+//方式1方式2对比：
 
+// 方式1，如果将来：
+// treat_eye() 改名为 treat_ophthalmology()
+// treat_eye() 需要增加一个参数
+// 治疗逻辑从医生转移到了护士或AI系统
+// 那么所有调用 doctor->treat_eye() 的地方，都需要逐一修改。这就是紧耦合——客户端和 Doctor 的具体实现绑死了。
+
+// 方式2，好处在于：
+// 客户端依赖的是接口，而不是具体方法
+// 所有命令都提供统一的 treat() 接口。
+// 客户端不关心命令内部是调用 treat_eye 还是 treat_nose，只需要 treat() 就行了。
+
+// 变更可以局部化
+// 如果 treat_eye() 改名了，只需要修改 CommandTreatEye 这一个类，所有使用该命令的客户端代码都不需要改动。
+// 如果需要改变治疗流程（比如先检查再治疗），也只需要修改命令类内部的实现，不影响客户端。
+
+// 扩展性更强
+// 可以通过配置文件或运行时条件，决定创建哪个命令对象，而不是在代码中硬编码调用哪个方法。
 
 void main()
 {
@@ -2202,7 +2219,7 @@ void main21_1()
 	//2 通过一个命令 医生通过 命令 治疗 治病
 	Doctor *doctor = new Doctor ;
 	Command * command = new CommandTreatEye(doctor); //shift +u //转小写 shift+ctl + u转大写
-	command->treat();
+	command->treat();   //多态。  提炼出Command抽象类，不同的命令类继承Command抽象类，重写treat()方法。 这样就实现了多态。 也就是医生通过命令来治疗病人。 也就是医生和病人之间有一个中间层，医生不直接接触病人，而是通过命令来治疗病人。
 	delete command;
 	delete doctor;
 	return ;
