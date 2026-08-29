@@ -1931,3 +1931,80 @@ void main()
 
 
 //行为模式
+
+//行为型--模板模式
+class MakeCar
+{
+public:
+	virtual void MakeHead() = 0;
+	virtual void MakeBody() = 0;
+	virtual void MakeTail() = 0;
+
+public:
+	void Make() //模板函数 把业务逻辑给做好
+	{
+		MakeTail();
+		MakeBody();
+		MakeHead();
+	}
+};
+
+//
+class Jeep : public MakeCar
+{
+public:
+	virtual void MakeHead()
+	{
+		cout << "jeep head" << endl;
+	}
+
+	virtual void MakeBody()
+	{
+		cout << "jeep body" << endl;
+	}
+
+	virtual void MakeTail()
+	{
+		cout << "jeep tail" << endl;
+	}
+};
+
+class Bus : public MakeCar
+{
+public:
+	virtual void MakeHead()
+	{
+		cout << "Bus head" << endl;
+	}
+
+	virtual void MakeBody()
+	{
+		cout << "Bus body" << endl;
+	}
+
+	virtual void MakeTail()
+	{
+		cout << "Bus tail" << endl;
+	}
+};
+
+void main()
+{
+	MakeCar *car = new Bus;
+	car->Make();
+	delete car;
+
+	MakeCar *car2 = new Jeep;
+	car2->Make();
+	delete car2;
+
+	
+	cout<<"hello..."<<endl;
+	system("pause");
+	return ;
+}
+
+//car->Make() 调用的不是子类的 Make 函数（因为子类确实没有重写它），
+// 而是基类 MakeCar 中定义的 Make 函数。 但这个基类的 Make 函数内部，
+// 又调用了三个虚函数（MakeHead、MakeBody、MakeTail），
+// 这些虚函数在子类中被重写了，因此表现出了多态行为。
