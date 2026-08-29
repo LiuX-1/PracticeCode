@@ -1927,3 +1927,7 @@ void main()
 	system("pause");
 	return ;
 }
+
+
+
+//行为模式
