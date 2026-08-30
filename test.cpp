@@ -2131,7 +2131,7 @@ class Command
 public:
 	virtual void treat() = 0;
 };
-class CommandTreatEye : public Command
+class CommandTreatEye : public Command  //基于抽象类派生子类，用来实现对不同命令的封装。里面包含执行命令的Doctor类。
 {
 public:
 	CommandTreatEye(Doctor *doctor)
@@ -2143,7 +2143,7 @@ public:
 		m_doctor->treat_eye();
 	}
 private:
-	Doctor *m_doctor;
+	Doctor *m_doctor;    // 包含Doctor，通过这种方式，实现command和Doctor的解耦。
 };
 
 
@@ -2280,6 +2280,81 @@ void main()
 	//main21_1();
 	//main21_2();
 	main21_3();
+	cout<<"hello..."<<endl;
+	system("pause");
+	return ;
+}
+
+
+// 策略模式
+
+class Strategy
+{
+public:
+	virtual void crypt() = 0;
+};
+
+//对称加密  速度快 加密大数据块文件 特点:加密密钥和解密密钥是一样的.
+//非对称加密 加密速度慢 加密强度高 高安全性高 ;特点: 加密密钥和解密密钥不一样  密钥对(公钥 和 私钥)
+//
+
+
+class AES :  public Strategy
+{
+public:
+	virtual void crypt()
+	{
+		cout << "AES加密算法" << endl;
+ 	}
+};
+class DES :  public Strategy
+{
+public:
+	virtual void crypt()
+	{
+		cout << "DES 加密算法" << endl;
+	}
+};
+
+
+class Context
+{
+public:
+	void setStrategy(Strategy *strategy)
+	{
+		this->strategy = strategy;
+	}
+	void myoperator()
+	{
+		strategy->crypt();
+	}
+
+protected:
+private:
+	Strategy *strategy;
+};
+
+
+void main()
+{
+	/*
+	//1 
+	DES *des = new DES;
+	des->crypt();
+	delete des;
+	*/
+
+	Strategy *strategy = NULL;
+
+	//strategy = new DES;
+	strategy = new AES;
+	Context *context = new Context;
+	context->setStrategy(strategy);
+	context->myoperator();
+	
+	delete  strategy;
+	delete  context;
+		 
 	cout<<"hello..."<<endl;
 	system("pause");
 	return ;
