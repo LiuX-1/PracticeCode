@@ -2150,7 +2150,7 @@ private:
 class CommandTreatNose : public Command
 {
 public:
-	CommandTreatNose(Doctor *doctor)
+	CommandTreatNose(Doctor *doctor)  //对比策略模式，策略模式不涉及对其他类的封装
 	{
 		m_doctor = doctor;
 	}
@@ -2159,7 +2159,7 @@ public:
 		m_doctor->treat_nose();
 	}
 private:
-	Doctor *m_doctor;
+	Doctor *m_doctor;   // 区别于策略模式的Strategy，Command模式中，Command类是对请求的封装，而Strategy是对算法的封装。
 };
 
 
@@ -2177,7 +2177,7 @@ public:
 	}
 protected:
 private:
-	Command *command;
+	Command *command;   //类似策略模式的Strategy
 };
 
 //护士长
@@ -2317,21 +2317,21 @@ public:
 };
 
 
-class Context
+class Context      //类似命令模式的doctor
 {
 public:
-	void setStrategy(Strategy *strategy)
+	void setStrategy(Strategy *strategy)   // 用抽象类来实例化本类
 	{
 		this->strategy = strategy;
 	}
 	void myoperator()
 	{
-		strategy->crypt();
+		strategy->crypt();   // 此处是多态，父类指针调用虚函数，实际调用的是子类的crypt()方法
 	}
 
 protected:
 private:
-	Strategy *strategy;
+	Strategy *strategy;    //类似命令模式的command
 };
 
 
