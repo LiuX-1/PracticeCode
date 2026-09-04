@@ -2434,3 +2434,19 @@ void main()
 
 
 // 思考方向 20260905
+
+
+
+
+//位运算
+//给定一个整型变量a，写两段代码，第一个设置a的bit3，第二个清除a的bit，在以上两个操作中，要保持其它位不变。
+//  1 #define BIT3 (0x1<<3)
+//  2   static int a;
+//  3   void set_bit3(void)
+//  4   {
+//  5    a |= BIT3;
+//  6   }
+//  7   void clear_bit3(void)
+//  8   {
+//  9    a &= ~BIT3;
+// 10   }
