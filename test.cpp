@@ -2431,3 +2431,6 @@ void main()
 	system("pause");
 	return ;
 }
+
+
+// 思考方向 20260905
