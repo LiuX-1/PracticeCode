@@ -109,4 +109,75 @@ Continuous Batching：因为 Decode 阶段每个请求进度不同，vLLM 用 Co
 
 ---
 大模型本质： predict next token。 每一时刻不断地输出下一时刻的词元（token）。  
-期间即推理过程：inference
+期间即推理过程：inference  
+
+---
+换个角度看大模型  
+![alt text](image-2.png)  
+![alt text](image-3.png)  
+
+预填充 多对一，  
+解码，一对一。  
+![alt text](image-4.png)  
+
+tokenizer 分词器：  
+![alt text](image-5.png)  
+
+调度，分配kv 缓存的控制块。
+![alt text](image-6.png)  
+![alt text](image-8.png)  
+![alt text](image-9.png)  
+![alt text](image-10.png)  
+
+并行正向传播：  
+![alt text](image-11.png)  
+![alt text](image-12.png)  
+
+在②处开辟kv cache，在③处生成的kv值存入cache。  
+
+![alt text](image-13.png)  
+
+整体：  
+![alt text](image-14.png)  
+
+![alt text](image-15.png)  
+![alt text](image-16.png)  
+
+![alt text](image-17.png)  
+
+每个阶段都需要有大语言模型参数计算
+![alt text](image-18.png)  
+
+Q含义，输入的token
+k含义，为了计算下一时刻的attention。输入的的key value
+v含义， 输入的的key value。   第一次是输入信息，第二次就包含第一次的q信息了。
+![alt text](image-19.png)  
+
+再换个角度：  
+![alt text](image-20.png)  
+![alt text](image-21.png)  
+
+
+## 推理核心问题  
+![alt text](image-22.png)  
+![alt text](image-23.png)
+
+prefill 不需要从缓存里读数据，但是会往缓存里写数据。  
+
+![alt text](image-24.png)  
+需要结合attention layer 神经网络基础理解这部分  
+
+kv cache这部分对提速很重要  
+![alt text](image-25.png)  
+
+page attention：  
+![alt text](image-26.png)  
+
+多个任务，对于每个request请求，预分配显存空间。针对最大长度进行分配。  
+![alt text](image-27.png)  
+取决于token大小（提示词长短）：  
+![alt text](image-28.png)  
+
+这样就导致空间浪费，长短不一。：  
+![alt text](image-29.png)  
+另一个4 token。
