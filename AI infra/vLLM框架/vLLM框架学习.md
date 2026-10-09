@@ -181,3 +181,30 @@ page attention：
 这样就导致空间浪费，长短不一。：  
 ![alt text](image-29.png)  
 另一个4 token。
+
+## page attention  
+![alt text](image-30.png)  
+需要的时候，才会区分配。  
+按照页分配，比如，一个block包含4个token大小。  
+
+另一个轻量版的vllm，Python实现的  
+![alt text](image-31.png)  
+实现了page attention：block table做了映射。  
+![alt text](image-32.png)  
+
+核心问题二： 批次的管理  
+![alt text](image-33.png)  
+
+vllm批次优化： 持续批处理，不存在等待，来了就放到队列  
+Continuous Batching  
+![alt text](image-34.png)  
+4行代表4个request，黄色代表prefill， 蓝色代表decode，红色代表结束。  
+![alt text](image-35.png)  
+每列，是token粒度。  
+
+推理引擎：  
+![alt text](image-36.png)  
+
+用nano-vllm理解推理引擎机制  
+![alt text](image-37.png)  
+![alt text](image-38.png)
