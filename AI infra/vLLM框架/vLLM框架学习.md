@@ -207,4 +207,7 @@ Continuous Batching
 
 用nano-vllm理解推理引擎机制  
 ![alt text](image-37.png)  
-![alt text](image-38.png)
+![alt text](image-38.png)  
+
+nano-vllm代码剖析：  
+![alt text](image-39.png)
