@@ -2608,3 +2608,35 @@ cpp
 std::vector<std::function<bool(int)>> filters;
 filters.push_back([](int x) { return x > 5; });
 filters.push_back([](int x) { return x % 2 == 0; });
+
+cpp
+#include <iostream>
+#include <functional>
+#include <vector>
+
+// 1. 普通全局函数
+int add(int a, int b) { return a + b; }
+
+// 2. 仿函数
+struct Multiply {
+    int operator()(int a, int b) const { return a * b; }
+};
+
+int main() {
+    // 声明一个能装“接收两个int，返回一个int”的函数的盒子
+    std::function<int(int, int)> func;
+
+    // 装普通函数
+    func = add;
+    std::cout << func(2, 3) << std::endl; // 输出 5
+
+    // 装 Lambda 表达式
+    func = [](int a, int b) { return a - b; };
+    std::cout << func(5, 2) << std::endl; // 输出 3
+
+    // 装仿函数
+    func = Multiply();
+    std::cout << func(4, 5) << std::endl; // 输出 20
+
+    return 0;
+}
