@@ -2548,3 +2548,63 @@ int main()
 
 
 //test
+
+
+仿函数整体回顾：
+标准库内置的仿函数（STL 提供）
+cpp
+std::plus<int> add;
+int res = add(3, 4); // 相当于 3 + 4，结果为 7
+
+// 配合算法使用
+std::vector<int> v = {3, 1, 2};
+std::sort(v.begin(), v.end(), std::greater<int>()); // 降序排序
+
+
+自定义的无状态仿函数
+cpp
+struct MyLess {
+    bool operator()(int a, int b) const {
+        return a < b;
+    }
+};
+
+
+自定义的有状态仿函数（核心杀手锏）
+cpp
+class ThresholdFilter {
+private:
+    int threshold;
+public:
+    ThresholdFilter(int t) : threshold(t) {} // 初始化状态
+    
+    bool operator()(int value) const {
+        return value > threshold; // 依赖外部传入的阈值
+    }
+};
+
+// 使用
+std::vector<int> v = {5, 12, 8, 20};
+int count = std::count_if(v.begin(), v.end(), ThresholdFilter(10)); 
+// 统计大于 10 的个数，结果为 2
+
+count_if的第三个参数本质就是要传一个仿函数进来做判断的
+
+
+
+现代 C++ 的变体：Lambda 表达式
+
+cpp
+int threshold = 10;
+// 这个 Lambda 在底层会变成一个带有 int threshold 成员变量的仿函数对象
+auto filter = [threshold](int value) { return value > threshold; };
+
+
+多态仿函数：std::function（类型擦除）
+cpp
+#include <functional>
+#include <vector>
+
+std::vector<std::function<bool(int)>> filters;
+filters.push_back([](int x) { return x > 5; });
+filters.push_back([](int x) { return x % 2 == 0; });
