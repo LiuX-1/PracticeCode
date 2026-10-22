@@ -214,4 +214,18 @@ nano-vllm代码剖析：
 
 
 ----
-继续vllm
+继续vllm  
+
+
+qianwen3部署加速实践  
+![alt text](image-40.png)  
+
+模型库：  B 对应10亿
+![alt text](image-41.png)  
+danse 稠密架构
+
+
+![alt text](image-42.png)  
+参数量多，推理速度慢。  
+A 代表激活的参数量，每时刻参与计算的参数量  
+MOE 架构，多专家系统，稀疏架构，当前流行的。
