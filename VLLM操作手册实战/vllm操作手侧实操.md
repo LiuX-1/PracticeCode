@@ -141,4 +141,39 @@ GPU 是一台极其暴力的矩阵计算器。假设你设定了 Batch Size = 10
 《推理优化和部署实践》笔记   1-37和 1-38  持续批处理Continuous Batching和不同推理框架对比。  
 
 
-书签--看到第三页
+书签--看到第三页  
+
+
+
+---
+### 环境信息  
+root@autodl-container-42bc42b309-e34e9a4d:~# python --version
+Python 3.10.8
+root@autodl-container-42bc42b309-e34e9a4d:~# python -c "import torch; print('Torch:', torch.__version__, '| CUDA:', torch.version.cuda)"
+Torch: 2.1.2+cu121 | CUDA: 12.1
+root@autodl-container-42bc42b309-e34e9a4d:~#  
+
+
+你的环境是绝佳的黄金组合：
+
+Python 3.10.8：完美符合 vLLM 的要求（>=3.10）。
+
+PyTorch 2.1.2 + CUDA 12.1：这是非常经典且极其稳定的搭配，完美适配你的 4090D 显卡。
+
+现在万事俱备，只欠东风。直接开始安装 vLLM 吧！为了防止最新版 vLLM 自动把你的 PyTorch 升级到 2.4（可能会破坏当前镜像的稳定性），强烈建议你安装一个与 Torch 2.1.2 完美兼容的 vLLM 稳定版（如 0.5.4）。  
+
+
+cd /root/autodl-tmp
+source /etc/network_turbo  
+
+执行下面这行命令（-i 后面是国内清华源，配合加速，安装速度会飞起）：
+
+bash
+pip install vllm==0.5.4 -i https://pypi.tuna.tsinghua.edu.cn/simple  
+
+
+安装跑完后，敲这行命令：
+
+bash
+python -c "import vllm; print('vLLM version:', vllm.__version__)"
+如果打印出 vLLM version: 0.5.4，恭喜你，你的 4090D 已经完成了工业级推理引擎的武装！
