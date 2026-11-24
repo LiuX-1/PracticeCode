@@ -335,4 +335,166 @@ vLLM 启动时，底层会去找第二张显卡（cuda:1），结果发现找不
 
 这就好比你写 C++ 的多线程代码，你写了一个 ThreadPool(1)。它依然是个线程池，只不过里面只有一个线程。等未来你换到 8 卡服务器时，直接改一下参数变成 ThreadPool(8)，代码不用重写。
 
-所以，你在终端启动时，不需要专门去写这些参数（因为默认就是 1），直接敲 vllm serve 模型名字 就足够了！现在可以去试跑你的第一个 Demo 了！
+所以，你在终端启动时，不需要专门去写这些参数（因为默认就是 1），直接敲 vllm serve 模型名字 就足够了！现在可以去试跑你的第一个 Demo 了！  
+
+
+
+---
+### 推理部署
+![alt text](image-2.png)  
+
+你确实还没部署“你心目中想要的那个大模型”（比如 Qwen 7B/14B），但文档这里也没让你直接去部署它。
+
+🎯 核心真相：文档在让你做“冒烟测试”（Smoke Test）
+文档里用的模型是 facebook/opt-125m。
+
+它有多大？ 125M 参数，也就是 1.25 亿参数。它的大小只有 几百兆，连个完整的手机 App 都不如，下载只需要几秒钟。
+
+它是大模型吗？ 在 AI 的语境里，它是“玩具级”的微缩模型。
+
+为什么用它？ 就像你刚组装完一台电脑，先不跑《赛博朋克2077》，而是先打开计算器看看能不能算 1+1。如果你的 vLLM 连 opt-125m 都跑不通，那绝对跑不了 7B 的 Qwen。
+
+🪄 魔法揭秘：vllm serve 到底做了什么？
+你看文档里的命令：vllm serve facebook/opt-125m
+
+你并没有提前下载这个模型对吧？这就是 vLLM 的厉害之处：
+
+当你敲下这行命令，vLLM 发现本地没有这个模型。
+
+它就会自动去 HuggingFace 社区下载这个几百兆的微缩模型。
+
+下载完后，自动加载到你的 4090D 显存里。
+
+启动一个 HTTP 服务，监听 8000 端口。
+
+所以，你不是没部署模型，你是让 vLLM 帮你自动“秒下”并部署了一个测试用的小模型。  
+
+
+你截取的这段 curl 命令，其实是你在扮演“用户”，去调用你刚刚启动的 vLLM 服务。
+
+因为你刚才敲的 vllm serve 已经把终端霸占了（服务正在前台运行，等着接收请求），所以这里必须在另一个终端窗口里敲这段代码。
+
+我用你熟悉的 C++ 和网络编程视角，把这行命令逐字拆解，你就全明白了：
+
+📦 1. 逐行拆解这段 HTTP 请求
+这本质上就是构造了一个 HTTP POST 请求：
+
+curl：这是一个 Linux 命令行下的“HTTP 客户端”工具。相当于你用浏览器或者写了一段 C++ 的 socket 代码去发请求。
+
+http://localhost:8000/v1/completions：你要访问的地址。
+
+localhost:8000：因为你 vLLM 就跑在本地 8000 端口。
+
+/v1/completions：这就是你上一张截图里学的，vLLM 模仿 OpenAI 提供的“文本补全”接口。
+
+-H "Content-Type: application/json"：HTTP 请求头。告诉 vLLM：“我发给你的是 JSON 格式的数据，请按 JSON 解析”。（类似你在 C++ 里约定好数据包的头部结构）。
+
+-d '...'：POST 请求的 Body 数据（数据包正文）。这里面有三个核心参数：
+
+"model": "facebook/opt-125m"：告诉服务器，我要用这个模型。
+
+"prompt": "Hello, world!"：你给大模型的提示词（相当于你在 ChatGPT 里打字）。
+
+"max_tokens": 20：限制大模型最多生成 20 个 Token，防止它长篇大论。  
+
+
+你截取的这段路径 /v1/completions，是理解大模型 API 设计的核心切入点。
+
+如果要用 C++ 后端的视角来解释，它就是一个 RESTful API 的路由地址（URL Path）。
+
+我们把它拆成两半来看：
+
+🧩 1. 拆解 /v1/completions
+/v1：代表 API 的版本号（Version 1）。在软件工程里，接口是会迭代的。OpenAI 为了兼容老用户，把第一代接口都放在 /v1 路径下。vLLM 为了完全模仿它，也用了 /v1。
+
+/completions：代表“文本补全”。这是大模型最原始、最底层的功能：接龙。
+
+🎯 2. 什么是“文本补全（Completions）”？
+你发给它的数据是："prompt": "Hello, world!"（提示词）。
+它做的事情不是像 ChatGPT 那样以“对话”的形式回复你，而是顺着你的话往下续写。
+
+如果是老模型（Base Model）：
+你输入："床前明月光，"
+它输出："疑是地上霜。举头望明月，低头思故乡。"
+（这就是纯粹的文本接龙，它不管你是谁，也不管上下文）。
+
+🆚 3. 它和 /v1/chat/completions 有什么区别？（极易混淆）
+你在 OpenWebUI 或者 ChatGPT 网页版上聊天的体验，用的是 /v1/chat/completions（聊天补全）。
+
+/v1/completions：输入是一段纯字符串（String）。
+
+/v1/chat/completions：输入是一个结构体数组（包含 Role: user, assistant, system 和 content）。
+
+为什么 vLLM 还要保留这个老接口？
+因为很多传统的代码、老旧的框架（比如 LangChain 的早期版本、或者某些写死的老脚本），依然在用这个老接口。作为推理基础设施，vLLM 必须向下兼容。  
+
+
+直接回答你：如果你输入 "Hello world"，这两个接口返回的画风会完全不同。
+
+一句话总结：
+
+/v1/completions 是“接龙”（你给上半句，它接下半句）。
+
+/v1/chat/completions 是“对话”（你抛出一个问题，它作为一个助手来回答你）。
+
+我们用具体的 JSON 数据来看，你瞬间就懂了：
+
+📝 场景一：/v1/completions（文本补全 / 接龙）
+你发给服务器的数据是一个纯字符串：
+
+json
+{
+  "model": "facebook/opt-125m",
+  "prompt": "Hello world",
+  "max_tokens": 10
+}
+服务器返回的可能是：
+
+json
+{
+  "choices": [
+    {
+      "text": ", this is a beautiful day. The sun is"
+    }
+  ]
+}
+理解：它根本不知道你是谁，也不管什么语境。它看到 "Hello world"，脑子里就开始疯狂续写后面的字。这就是大语言模型最原始的“文字接龙”本能。
+
+💬 场景二：/v1/chat/completions（聊天补全 / 对话）
+你发给服务器的数据是一个带有角色（Role）的结构体：
+
+json
+{
+  "model": "Qwen-7B-Chat",
+  "messages": [
+    {"role": "user", "content": "Hello world"}
+  ]
+}
+服务器返回的可能是：
+
+json
+{
+  "choices": [
+    {
+      "message": {
+        "role": "assistant",
+        "content": "Hello! How can I help you today? (你好！今天有什么我可以帮你的吗？)"
+      }
+    }
+  ]
+}
+理解：模型在后台把 {"role": "user", "content": "Hello world"} 偷偷拼接成了一套特殊的格式（比如 [用户说]: Hello world [AI说]:）。模型看到这个格式，立刻进入“客服”状态，开始回答你。
+
+🧠 底层为什么会有这种区别？（Infra 视角）
+模型不同：
+
+老一代的模型（如 facebook/opt-125m 或者早期 Llama 的 base 版）只会接龙，只能用 /v1/completions。
+
+现在的模型（如 Qwen-Instruct、ChatGLM）经过了人类偏好的微调训练（RLHF），学会了“对话”。它们必须配 /v1/chat/completions 才能发挥威力。
+
+Prompt 封装（极其重要）：
+当你调用 /v1/chat/completions 时，vLLM 底层会调用模型的 Chat Template（对话模板）。它会把你的 JSON 数组拼接成模型能看懂的特殊字符串（比如加上 <|im_start|> 和 <|im_end|> 等控制符）。如果拼接错了，模型就会胡言乱语。  
+
+
+
+22月25号  书签，  安装vllm 指定版本。
